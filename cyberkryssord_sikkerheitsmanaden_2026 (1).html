@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="nn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Cyberkryssord – Sikkerheitsmånaden 2026</title>
+<style>
+  :root {
+    --ink:#10233d;
+    --muted:#5d6d7e;
+    --paper:#ffffff;
+    --page:#eef4f8;
+    --navy:#0c2948;
+    --navy2:#123d68;
+    --accent:#20a4a7;
+    --accent-soft:#dff4f3;
+    --line:#c9d6e2;
+    --good:#157347;
+    --good-bg:#e9f7ef;
+    --bad:#b42318;
+    --bad-bg:#fff0ee;
+    --focus:#ffd166;
+    --shadow:0 18px 45px rgba(16,35,61,.12);
+    --radius:22px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family:Inter,Segoe UI,Arial,sans-serif;
+    background:linear-gradient(180deg,#eaf2f7 0,#f7fafc 55%,#eef4f8 100%);
+    color:var(--ink);
+  }
+  button,input{font:inherit}
+  .hero{
+    background:
+      radial-gradient(circle at 90% 10%,rgba(32,164,167,.32),transparent 27%),
+      radial-gradient(circle at 12% 120%,rgba(80,133,188,.28),transparent 35%),
+      linear-gradient(135deg,var(--navy),var(--navy2));
+    color:#fff;
+    padding:38px 20px 74px;
+  }
+  .hero-inner{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:26px}
+  .lockmark{
+    width:82px;height:82px;flex:0 0 82px;border-radius:24px;
+    display:grid;place-items:center;background:rgba(255,255,255,.11);
+    border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 1px rgba(255,255,255,.2)
+  }
+  .lockmark svg{width:48px;height:48px}
+  .eyebrow{font-size:.83rem;text-transform:uppercase;letter-spacing:.17em;font-weight:750;color:#a9e3df;margin-bottom:8px}
+  h1{font-size:clamp(2rem,5vw,3.7rem);line-height:1;margin:0 0 12px;letter-spacing:-.04em}
+  .hero p{margin:0;max-width:720px;color:#d9e7f2;font-size:1.05rem;line-height:1.6}
+  main{max-width:1180px;margin:-42px auto 50px;padding:0 20px}
+  .card{background:var(--paper);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid rgba(201,214,226,.7)}
+  .intro{padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .intro strong{display:block;font-size:1.08rem;margin-bottom:4px}
+  .intro span{color:var(--muted);line-height:1.5}
+  .progress-wrap{min-width:190px;text-align:right}
+  .progress-text{font-weight:750;font-variant-numeric:tabular-nums}
+  .progress-track{height:8px;background:#e6edf3;border-radius:999px;overflow:hidden;margin-top:8px}
+  .progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),#4fc3bd);transition:width .2s ease}
+  .game{display:grid;grid-template-columns:minmax(380px,1.03fr) minmax(330px,.97fr);gap:20px}
+  .puzzle-card,.clue-card{padding:24px}
+  .section-title{margin:0 0 6px;font-size:1.3rem}
+  .section-sub{margin:0 0 18px;color:var(--muted);font-size:.93rem;line-height:1.5}
+  .grid-shell{overflow:visible;padding:3px 3px 12px}
+  #crossword{
+    --cols:14;
+    display:grid;
+    grid-template-columns:repeat(var(--cols),minmax(0,1fr));
+    gap:2px;
+    width:min(100%,614px);
+    margin:0 auto;
+    user-select:none;
+  }
+  .cell{aspect-ratio:1 / 1}
+  .cell{position:relative;background:#fff;border:1px solid #9fb3c5;border-radius:5px;overflow:hidden;transition:.12s ease}
+  .cell.block{background:transparent;border-color:transparent;pointer-events:none}
+  .cell.active-word{background:#edf8f7;border-color:#73c9c5}
+  .cell.current{outline:3px solid var(--focus);outline-offset:-1px;z-index:2}
+  .cell.correct{background:var(--good-bg);border-color:#80c7a3}
+  .cell.wrong{background:var(--bad-bg);border-color:#e68e86}
+  .cell input{
+    width:100%;height:100%;border:0;outline:0;background:transparent;text-transform:uppercase;
+    text-align:center;font-weight:800;font-size:clamp(.92rem,2vw,1.15rem);color:var(--ink);padding:0;caret-color:transparent
+  }
+  .num{position:absolute;left:3px;top:1px;font-size:.52rem;line-height:1;font-weight:750;color:#4b6177;pointer-events:none;z-index:3}
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;justify-content:center}
+  .btn{border:0;border-radius:12px;padding:11px 15px;font-weight:750;cursor:pointer;transition:.15s ease;display:inline-flex;align-items:center;gap:8px}
+  .btn:hover{transform:translateY(-1px)}
+  .btn:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  .btn.primary{background:var(--navy);color:#fff}
+  .btn.secondary{background:#e9f0f5;color:var(--ink)}
+  .btn.hint{background:var(--accent-soft);color:#0a6667}
+  .status{margin-top:14px;min-height:46px;border-radius:12px;padding:12px 14px;background:#f3f7fa;color:var(--muted);line-height:1.45}
+  .status.good{background:var(--good-bg);color:var(--good)}
+  .status.bad{background:var(--bad-bg);color:var(--bad)}
+  .clue-groups{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .clue-heading{font-size:.86rem;letter-spacing:.12em;text-transform:uppercase;color:#557086;margin:0 0 10px}
+  .clues{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+  .clue{border:1px solid #d8e2ea;border-radius:12px;padding:10px 11px;cursor:pointer;line-height:1.4;background:#fff;transition:.14s ease}
+  .clue:hover,.clue.selected{border-color:#79c9c5;background:#f0f9f8}
+  .clue b{display:inline-grid;place-items:center;min-width:25px;height:25px;padding:0 6px;border-radius:8px;background:#eaf0f5;margin-right:7px;color:#294761;font-size:.85rem}
+  .clue small{display:none;margin:5px 0 0 33px;color:#0c6c6d;font-weight:700}
+  body.hints-on .clue small{display:block}
+  .tip{margin-top:18px;padding:14px;border-left:4px solid var(--accent);background:#f3f9f9;border-radius:0 12px 12px 0;color:#486174;font-size:.9rem;line-height:1.5}
+  .success{
+    position:fixed;inset:0;background:rgba(4,22,39,.62);backdrop-filter:blur(5px);display:none;
+    align-items:center;justify-content:center;padding:20px;z-index:50
+  }
+  .success.show{display:flex}
+  .success-box{width:min(500px,100%);background:#fff;border-radius:25px;padding:30px;text-align:center;box-shadow:0 30px 90px rgba(0,0,0,.3);animation:pop .3s ease both}
+  .success-icon{width:74px;height:74px;border-radius:50%;display:grid;place-items:center;background:var(--good-bg);color:var(--good);font-size:2.3rem;margin:0 auto 15px}
+  .success h2{margin:0 0 10px;font-size:1.8rem}
+  .success p{color:var(--muted);line-height:1.55;margin:0 0 20px}
+  .footer-note{text-align:center;color:#6d7d8d;font-size:.82rem;margin-top:22px;line-height:1.5}
+  @keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+  @media(max-width:860px){
+    .game{grid-template-columns:1fr}.hero-inner{align-items:flex-start}.lockmark{width:66px;height:66px;flex-basis:66px}.intro{align-items:flex-start;flex-direction:column}.progress-wrap{width:100%;text-align:left}.clue-groups{grid-template-columns:1fr 1fr}
+  }
+  @media(max-width:560px){
+    .hero{padding-top:28px}.hero-inner{gap:14px}.lockmark{display:none}.puzzle-card,.clue-card{padding:17px}.clue-groups{grid-template-columns:1fr}#crossword{gap:1px}.num{font-size:.45rem}.toolbar{justify-content:stretch}.btn{flex:1;justify-content:center;min-width:44%}
+  }
+  @media print{.hero{padding:20px;background:#fff;color:#000}.hero p,.eyebrow{color:#333}.lockmark,.toolbar,.status,.footer-note{display:none}main{margin:0}.card{box-shadow:none}.game{grid-template-columns:1fr 1fr}.cell input{color:transparent}.clue small{display:none!important}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <div class="lockmark" aria-hidden="true">
+      <svg viewBox="0 0 64 64" fill="none"><rect x="13" y="28" width="38" height="27" rx="7" stroke="white" stroke-width="4"/><path d="M21 28v-8c0-7 5-12 11-12s11 5 11 12v8" stroke="white" stroke-width="4" stroke-linecap="round"/><circle cx="32" cy="41" r="3.5" fill="#8ce1dc"/><path d="M32 44.5v4" stroke="#8ce1dc" stroke-width="3" stroke-linecap="round"/></svg>
+    </div>
+    <div>
+      <div class="eyebrow">Sikkerheitsmånaden 2026 · Veke 1</div>
+      <h1>Cyberkryssord</h1>
+      <p>Kor cyberklar er du? Finn dei ti orda. Du treng ikkje vere IT-ekspert – litt sunn skepsis kjem du langt med.</p>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="card intro" aria-label="Introduksjon og framdrift">
+    <div><strong>☕ Ei lita utfordring til kaffipausen</strong><span>Klikk på ei rute eller ei ledetråd og skriv svaret. Alle svar er vanlege ord frå den digitale kvardagen.</span></div>
+    <div class="progress-wrap">
+      <div class="progress-text" id="progressText">0 av 10 ord ferdige</div>
+      <div class="progress-track" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+    </div>
+  </section>
+
+  <div class="game">
+    <section class="card puzzle-card">
+      <h2 class="section-title">Kryssordet</h2>
+      <p class="section-sub">Skriv éin bokstav i kvar rute. Du kan bruke piltastane for å flytte deg.</p>
+      <div class="grid-shell"><div id="crossword" role="grid" aria-label="Cyberkryssord"></div></div>
+      <div class="toolbar">
+        <button class="btn primary" type="button" onclick="checkAnswers()">✓ Sjekk svar</button>
+        <button class="btn hint" type="button" onclick="toggleHints()">💡 Vis hint</button>
+        <button class="btn secondary" type="button" onclick="resetPuzzle()">↻ Nullstill</button>
+      </div>
+      <div class="status" id="status" aria-live="polite">Tips: Start med dei orda du kjenner med ein gong. Kryssande bokstavar hjelper deg vidare.</div>
+    </section>
+
+    <aside class="card clue-card">
+      <h2 class="section-title">Ledetrådar</h2>
+      <p class="section-sub">Klikk på ei ledetråd for å hoppe til riktig stad i kryssordet.</p>
+      <div class="clue-groups">
+        <div>
+          <h3 class="clue-heading">Vassrett</h3>
+          <ol class="clues" id="acrossClues"></ol>
+        </div>
+        <div>
+          <h3 class="clue-heading">Loddrett</h3>
+          <ol class="clues" id="downClues"></ol>
+        </div>
+      </div>
+      <div class="tip"><strong>Hugs:</strong> Ingen seriøs aktør treng passordet eller eingongskoden din. Er du usikker på ei melding, stopp opp og sjekk via ein kanal du stolar på.</div>
+    </aside>
+  </div>
+  <p class="footer-note">Kryssordet køyrer berre lokalt i nettlesaren. Det sender ikkje svar eller andre data vidare.</p>
+</main>
+
+<div class="success" id="success" role="dialog" aria-modal="true" aria-labelledby="successTitle">
+  <div class="success-box">
+    <div class="success-icon">✓</div>
+    <h2 id="successTitle">Full pott! 🎉</h2>
+    <p>Du løyste cyberkryssordet. Første utfordring i sikkerheitsmånaden er i boks – og du har fått ein liten repetisjon av gode digitale vanar på kjøpet.</p>
+    <button class="btn primary" type="button" onclick="closeSuccess()">Lukk</button>
+  </div>
+</div>
+
+<template id="letterInputTemplate"><input inputmode="text" maxlength="1" autocomplete="off" spellcheck="false"></template>
+
+<script>
+const PUZZLE = [
+  {number:1, answer:'BANKID', row:0, col:5, dir:'down', clue:'Digital legitimasjon mange brukar for å logge inn og signere.'},
+  {number:2, answer:'TOFAKTOR', row:1, col:0, dir:'down', clue:'Ekstra tryggleik ved innlogging: noko du veit, pluss noko du har.'},
+  {number:3, answer:'BACKUP', row:1, col:4, dir:'across', clue:'Ein ekstra kopi du blir veldig glad for den dagen noko går gale.'},
+  {number:4, answer:'PHISHING', row:1, col:9, dir:'down', clue:'Falske e-postar eller meldingar som prøver å lure deg.'},
+  {number:5, answer:'VEDLEGG', row:2, col:13, dir:'down', clue:'Fil som følgjer med ein e-post – opne med omtanke.'},
+  {number:6, answer:'SVINDEL', row:3, col:3, dir:'down', clue:'Når nokon prøver å lure deg for pengar eller informasjon.'},
+  {number:7, answer:'KODE', row:3, col:11, dir:'down', clue:'Kort hemmeleg teikn- eller talrekkje du ikkje bør lese opp til ein ukjend innringar.'},
+  {number:8, answer:'PASSORD', row:4, col:7, dir:'across', clue:'Bør vere langt, unikt og ikkje gjenbrukast på fleire tenester.'},
+  {number:9, answer:'OPPDATERING', row:7, col:0, dir:'across', clue:'Installer denne for å få feilrettingar og tryggleiksforbetringar.'},
+  {number:10, answer:'LENKJE', row:9, col:3, dir:'across', clue:'Kan sjå trygg ut, men føre ein annan stad enn du trur.'}
+];
+const ROWS = 10, COLS = 14;
+const cellMap = new Map();
+const starts = new Map();
+let activeWord = PUZZLE[0];
+let hintsVisible = false;
+
+function key(r,c){ return `${r},${c}`; }
+
+function buildPuzzle(){
+  PUZZLE.forEach(word => {
+    starts.set(key(word.row,word.col), word.number);
+    [...word.answer].forEach((letter,i) => {
+      const r = word.row + (word.dir === 'down' ? i : 0);
+      const c = word.col + (word.dir === 'across' ? i : 0);
+      const k = key(r,c);
+      if(!cellMap.has(k)) cellMap.set(k,{answer:letter,words:[]});
+      const cell = cellMap.get(k);
+      if(cell.answer !== letter) throw new Error('Ugyldig kryssorddata');
+      cell.words.push(word.number);
+    });
+  });
+
+  const grid = document.getElementById('crossword');
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const k=key(r,c);
+      const meta=cellMap.get(k);
+      const wrap=document.createElement('div');
+      wrap.className=meta?'cell':'cell block';
+      wrap.dataset.key=k;
+      wrap.setAttribute('role','gridcell');
+      if(meta){
+        const n=starts.get(k);
+        if(n){ const num=document.createElement('span'); num.className='num'; num.textContent=n; wrap.appendChild(num); }
+        const input=document.getElementById('letterInputTemplate').content.firstElementChild.cloneNode(true);
+        input.setAttribute('aria-label',`Rute rad ${r+1}, kolonne ${c+1}`);
+        input.dataset.row=r; input.dataset.col=c; input.dataset.answer=meta.answer; input.dataset.words=meta.words.join(',');
+        input.addEventListener('focus',()=>selectFromCell(input));
+        input.addEventListener('click',()=>cycleWordAtCell(input));
+        input.addEventListener('input',e=>onInput(e,input));
+        input.addEventListener('keydown',e=>onKey(e,input));
+        wrap.appendChild(input);
+      }
+      grid.appendChild(wrap);
+    }
+  }
+  renderClues();
+  setActiveWord(PUZZLE[0],false);
+  updateProgress();
+}
+
+function renderClues(){
+  const across=document.getElementById('acrossClues');
+  const down=document.getElementById('downClues');
+  PUZZLE.forEach(word=>{
+    const li=document.createElement('li');
+    li.className='clue'; li.dataset.word=word.number; li.tabIndex=0;
+    li.innerHTML=`<b>${word.number}</b>${word.clue}<small>Hint: ${word.answer[0]} · ${word.answer.length} bokstavar</small>`;
+    li.addEventListener('click',()=>focusWord(word.number));
+    li.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();focusWord(word.number);} });
+    (word.dir==='across'?across:down).appendChild(li);
+  });
+}
+
+function wordCells(word){
+  return [...word.answer].map((_,i)=>{
+    const r=word.row+(word.dir==='down'?i:0);
+    const c=word.col+(word.dir==='across'?i:0);
+    return document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+  });
+}
+
+function setActiveWord(word,focus=true){
+  activeWord=word;
+  document.querySelectorAll('.cell').forEach(el=>el.classList.remove('active-word','current'));
+  document.querySelectorAll('.clue').forEach(el=>el.classList.toggle('selected',Number(el.dataset.word)===word.number));
+  const cells=wordCells(word);
+  cells.forEach(i=>i.parentElement.classList.add('active-word'));
+  if(focus){
+    const target=cells.find(i=>!i.value)||cells[0];
+    if(target){target.focus();target.parentElement.classList.add('current');}
+  }
+}
+
+function focusWord(number){ setActiveWord(PUZZLE.find(w=>w.number===number)); }
+
+function selectFromCell(input){
+  const ids=input.dataset.words.split(',').map(Number);
+  if(!ids.includes(activeWord.number)) setActiveWord(PUZZLE.find(w=>w.number===ids[0]),false);
+  document.querySelectorAll('.cell').forEach(el=>el.classList.remove('current'));
+  input.parentElement.classList.add('current');
+}
+
+function cycleWordAtCell(input){
+  const ids=input.dataset.words.split(',').map(Number);
+  if(ids.length<2) return;
+  const idx=ids.indexOf(activeWord.number);
+  setActiveWord(PUZZLE.find(w=>w.number===ids[(idx+1)%ids.length]),false);
+  input.parentElement.classList.add('current');
+}
+
+function onInput(event,input){
+  input.value=(input.value||'').toUpperCase().replace(/[^A-ZÆØÅ]/g,'').slice(-1);
+  input.parentElement.classList.remove('correct','wrong');
+  updateProgress();
+  if(input.value) moveAlongWord(input,1);
+}
+
+function onKey(event,input){
+  if(event.key==='Backspace'&&!input.value){event.preventDefault();moveAlongWord(input,-1,true);return;}
+  const dirs={ArrowRight:[0,1],ArrowLeft:[0,-1],ArrowDown:[1,0],ArrowUp:[-1,0]};
+  if(dirs[event.key]){
+    event.preventDefault();
+    const [dr,dc]=dirs[event.key];
+    focusCell(Number(input.dataset.row)+dr,Number(input.dataset.col)+dc);
+  }
+}
+
+function moveAlongWord(input,step,clear=false){
+  const cells=wordCells(activeWord); const idx=cells.indexOf(input); const next=cells[idx+step];
+  if(next){next.focus(); if(clear){next.value='';updateProgress();}}
+}
+
+function focusCell(r,c){
+  let target=document.querySelector(`input[data-row="${r}"][data-col="${c}"]`);
+  if(target) target.focus();
+}
+
+function wordIsComplete(word){ return wordCells(word).every(i=>i.value.toUpperCase()===i.dataset.answer); }
+
+function updateProgress(){
+  const done=PUZZLE.filter(wordIsComplete).length;
+  document.getElementById('progressText').textContent=`${done} av ${PUZZLE.length} ord ferdige`;
+  document.getElementById('progressBar').style.width=`${(done/PUZZLE.length)*100}%`;
+}
+
+function checkAnswers(){
+  let filled=0, correct=0;
+  document.querySelectorAll('.cell input').forEach(input=>{
+    const box=input.parentElement; box.classList.remove('correct','wrong');
+    if(input.value){
+      filled++;
+      if(input.value.toUpperCase()===input.dataset.answer){box.classList.add('correct');correct++;}
+      else box.classList.add('wrong');
+    }
+  });
+  updateProgress();
+  const total=cellMap.size;
+  const status=document.getElementById('status');
+  status.className='status';
+  if(correct===total){
+    status.classList.add('good');status.textContent='Alt er rett! Du har løyst heile kryssordet. 🎉';
+    document.getElementById('success').classList.add('show');
+  }else if(filled===0){
+    status.textContent='Du må fylle inn nokre bokstavar før eg kan sjekke svara.';
+  }else{
+    const wrong=filled-correct;
+    if(wrong){status.classList.add('bad');status.textContent=`Du har ${wrong} ${wrong===1?'bokstav':'bokstavar'} som ikkje stemmer enno. Raude ruter viser kvar du kan sjå ein gong til.`;}
+    else{status.classList.add('good');status.textContent='Alt du har fylt inn så langt er rett. Hald fram!';}
+  }
+}
+
+function toggleHints(){
+  hintsVisible=!hintsVisible;
+  document.body.classList.toggle('hints-on',hintsVisible);
+  const btn=document.querySelector('.btn.hint');
+  btn.textContent=hintsVisible?'💡 Skjul hint':'💡 Vis hint';
+  const status=document.getElementById('status');
+  status.className='status';
+  status.textContent=hintsVisible?'Hint er synlege under kvar ledetråd: første bokstav og talet på bokstavar.':'Hinta er skjulte igjen.';
+}
+
+function resetPuzzle(){
+  if(!confirm('Vil du tømme heile kryssordet og starte på nytt?')) return;
+  document.querySelectorAll('.cell input').forEach(i=>{i.value='';i.parentElement.classList.remove('correct','wrong');});
+  document.getElementById('status').className='status';
+  document.getElementById('status').textContent='Kryssordet er nullstilt. Lukke til!';
+  updateProgress(); setActiveWord(PUZZLE[0]);
+}
+
+function closeSuccess(){document.getElementById('success').classList.remove('show');}
+document.getElementById('success').addEventListener('click',e=>{if(e.target.id==='success')closeSuccess();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSuccess();});
+
+buildPuzzle();
+</script>
+</body>
+</html>
